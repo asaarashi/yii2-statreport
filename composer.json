@@ -13,6 +13,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "miloschuman/yii2-highcharts-widget": "*"
+    "miloschuman/yii2-highcharts-widget": "*",
+    "datatables/datatables": "*"
   }
 }
