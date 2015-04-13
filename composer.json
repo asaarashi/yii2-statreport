@@ -1,7 +1,11 @@
 {
   "name": "thrieu/yii2-statreport",
   "description": "Under development",
-  "keywords": ["yii2", "extension", "widget"],
+  "keywords": [
+    "yii2",
+    "extension",
+    "widget"
+  ],
   "homepage": "https://github.com/thrieu/yii2-statreport",
   "type": "yii2-extension",
   "license": "BSD 3-Clause",
@@ -15,5 +19,10 @@
   "require": {
     "miloschuman/yii2-highcharts-widget": "*",
     "datatables/datatables": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "thrieu\\statreport\\": ""
+    }
   }
 }
