@@ -17,6 +17,9 @@
   ],
   "minimum-stability": "dev",
   "require": {
+    "yiisoft/yii2-bootstrap": "*",
+    "bower-asset/datatables-bootstrap3": "*",
+    "bower-asset/datatables-responsive": "*",
     "miloschuman/yii2-highcharts-widget": "*",
     "datatables/datatables": "*"
   },

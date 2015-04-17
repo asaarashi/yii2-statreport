@@ -1,21 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2015/4/9
- * Time: 17:53
- */
-
 namespace thrieu\statreport;
 
 use Yii;
 use yii\base\Widget;
+use yii\bootstrap\ButtonGroup;
 use yii\helpers\Html;
 use yii\data\ArrayDataProvider;
 use yii\base\InvalidConfigException;
 use miloschuman\highcharts\Highcharts;
 use yii\helpers\Json;
 use yii\web\JsExpression;
+use yii\helpers\ArrayHelper;
 
 class StatReport extends Widget {
     public $htmlOptions = [];
@@ -24,6 +19,11 @@ class StatReport extends Widget {
     public $tableOptions = [];
     public $chartOptions = [];
     public $params = [];
+    public $toggleBtnTableLabel = '<i class="fa fa-table"></i>';
+    public $toggleBtnChartLabel = '<i class="fa fa-line-chart"></i>';
+
+    const VIEW_CHART = 'chart';
+    const VIEW_TABLE = 'table';
 
     public function run() {
         if( ! $this->url) {
@@ -58,6 +58,17 @@ class StatReport extends Widget {
             $columns[] = $column;
         }
 
+        $highcharts = Highcharts::begin([
+            'htmlOptions' => [
+                'data-view-role' => static::VIEW_CHART,
+                'class' => 'stat-report-view',
+            ],
+            'options' => $this->chartOptions,
+        ]);
+        $highcharts->scripts = ['highcharts', 'modules/data'];
+        $highcharts->callback = 'createHighcharts'.$this->getId();
+        $highcharts->end();
+
         echo DataTablesGridView::widget([
             'filterModel' => null,
             'emptyText' => null,
@@ -65,12 +76,22 @@ class StatReport extends Widget {
             'dataProvider' => new ArrayDataProvider([
                 'pagination' => false,
             ]),
+            'options' => [
+                'data-view-role' => static::VIEW_TABLE,
+                'class' => 'grid-view stat-report-view'
+            ],
         ]);
 
-        $highcharts = Highcharts::begin($this->chartOptions);
-        $highcharts->scripts = ['highcharts', 'modules/data'];
-        $highcharts->callback = 'createHighcharts'.$this->getId();
-        $highcharts->end();
+        echo ButtonGroup::widget([
+            'options' => [
+                'class' => 'toggle-view-buttons',
+            ],
+            'buttons' => [
+                ['label' => $this->toggleBtnChartLabel, 'options' => ['value' => static::VIEW_CHART]],
+                ['label' => $this->toggleBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE]],
+            ],
+            'encodeLabels' => false,
+        ]);
 
         echo Html::endTag('div');
 
@@ -97,17 +118,6 @@ class StatReport extends Widget {
             chartSeries: chartSeries{$this->id},
             chartOptions: {$highchartsOptions}
         });\n";
-        /*
-        $js .= "dataTable{$this->id}.on('xhr.dt', function(e, settings, json) {
-            var data = chartSeries{$this->id}.concat(json.data);
-            console.log(data);
-            var highchartsOptions = {$highchartsOptions};
-            highchartsOptions.data = {
-                rows: data
-            };
-            $('#{$highcharts->getId()}').highcharts(highchartsOptions);
-        });";
-        */
         $this->view->registerJs($js);
 
         parent::run();
