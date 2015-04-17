@@ -21,6 +21,8 @@ class StatReport extends Widget {
     public $params = [];
     public $toggleBtnTableLabel = '<i class="fa fa-table"></i>';
     public $toggleBtnChartLabel = '<i class="fa fa-line-chart"></i>';
+    public $bootstrap = true;
+    public $responsive = true;
 
     const VIEW_CHART = 'chart';
     const VIEW_TABLE = 'table';
@@ -39,7 +41,7 @@ class StatReport extends Widget {
 
         foreach($this->series as $i => $s) {
             $this->series[$i] = Yii::createObject(array_merge([
-                'class' => '\thrieu\statreport\Series',
+                'class' => Series::className(),
             ], $s));
         }
 
@@ -96,6 +98,13 @@ class StatReport extends Widget {
         echo Html::endTag('div');
 
         StatReportAsset::register($this->view);
+        if($this->bootstrap) {
+            DataTablesBootstrapAsset::register($this->view);
+        }
+        if($this->responsive) {
+            DataTablesResponsiveAsset::register($this->view);
+            $this->tableOptions = ArrayHelper::merge(['responsive' => true], $this->tableOptions);
+        }
 
         $chartSeries = [];
         foreach($this->series as $s) {
