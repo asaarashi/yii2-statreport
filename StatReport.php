@@ -54,6 +54,11 @@ class StatReport extends Widget {
         echo Html::beginTag('div', $this->htmlOptions);
 
         if($this->showCaption) {
+            if( ! isset($this->captionOptions['class'])) {
+                $this->captionOptions['class'] = 'statreport-caption';
+            } else {
+                $this->captionOptions['class'] = 'statreport-caption '.$this->captionOptions['class'];
+            }
             echo Html::beginTag('div', ArrayHelper::merge(
                 [
                     'class' => 'statreport-caption'.(isset($this->captionOptions['class']) ? ' '.$this->captionOptions['class'] : '')
