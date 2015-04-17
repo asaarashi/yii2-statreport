@@ -3,7 +3,6 @@
 namespace thrieu\statreport;
 
 use yii\base\Object;
-use yii\helpers\Html;
 
 class Series extends Object
 {
@@ -16,5 +15,4 @@ class Series extends Object
     public $headerOptions = [];
     public $footerOptions = [];
     public $isInChart = true;
-
 }

@@ -35,18 +35,25 @@
             self.data('stat-report', options);
 
             var tableOptions = options.tableOptions;
-            tableOptions.ajax = buildUrl.call(self);
+            tableOptions.ajax = {
+                'url': buildUrl.call(self),
+                'dataSrc': 'table'
+            };
             var dataTable = options.table.dataTable(tableOptions);
             self.data('data-tables', dataTable);
 
             dataTable.on('xhr.dt', function(e, settings, json) {
-                var data = options.chartSeries.concat(json.data);
+                var data = options.chartSeries.concat(json.chart);
                 console.log(data);  // 调试用
                 var highchartsOptions = options.chartOptions;
                 highchartsOptions.data = {
                     rows: data
                 };
                 options.chart.highcharts(highchartsOptions);
+
+                if(typeof json.caption != 'undefined') {
+                    self.find('div.statreport-caption').html(json.caption);
+                }
             });
 
             self.find('div.toggle-view-buttons > button').click(function() {

@@ -18,6 +18,8 @@ class StatReport extends Widget {
     public $url;
     public $tableOptions = [];
     public $chartOptions = [];
+    public $showCaption = true;
+    public $captionOptions = [];
     public $params = [];
     public $toggleBtnTableLabel = '<i class="fa fa-table"></i>';
     public $toggleBtnChartLabel = '<i class="fa fa-line-chart"></i>';
@@ -27,7 +29,7 @@ class StatReport extends Widget {
     const VIEW_CHART = 'chart';
     const VIEW_TABLE = 'table';
 
-    public function run() {
+    public function init() {
         if( ! $this->url) {
             throw new InvalidConfigException('The "url" property must be specified.');
         }
@@ -45,8 +47,22 @@ class StatReport extends Widget {
             ], $s));
         }
 
+    }
+
+    public function run() {
         // render the container element
         echo Html::beginTag('div', $this->htmlOptions);
+
+        if($this->showCaption) {
+            echo Html::beginTag('div', ArrayHelper::merge(
+                [
+                    'class' => 'statreport-caption'.(isset($this->captionOptions['class']) ? ' '.$this->captionOptions['class'] : '')
+                ],
+                $this->captionOptions
+            ));
+
+            echo Html::endTag('div');
+        }
 
         $columns = [];
         foreach($this->series as $s) {
