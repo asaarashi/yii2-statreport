@@ -158,7 +158,7 @@ class StatReport extends Widget {
         foreach($this->params as $key => $param) {
             if(is_array($param) && count($param) == 2) {
                 list($model, $attribute) = $param;
-                $params[Html::getInputName($model, $attribute)] = new JsExpression('$("#'.Html::getInputId($model, $attribute).')');
+                $params[Html::getInputName($model, $attribute)] = new JsExpression('$("#'.Html::getInputId($model, $attribute).'")');
             } else {
                 $params[$key] = $param;
             }
