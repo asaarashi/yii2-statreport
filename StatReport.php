@@ -16,6 +16,7 @@ class StatReport extends Widget {
     public $htmlOptions = [];
     public $series = [];
     public $url;
+    public $dataTablesOptions = [];
     public $tableOptions = [];
     public $chartOptions = [];
     public $showCaption = true;
@@ -103,6 +104,7 @@ class StatReport extends Widget {
                 'data-view-role' => static::VIEW_TABLE,
                 'class' => 'grid-view stat-report-view'
             ],
+            'tableOptions' => $this->tableOptions,
         ]);
 
         echo ButtonGroup::widget([
@@ -124,7 +126,7 @@ class StatReport extends Widget {
         }
         if($this->responsive) {
             DataTablesResponsiveAsset::register($this->view);
-            $this->tableOptions = ArrayHelper::merge(['responsive' => true], $this->tableOptions);
+            $this->dataTablesOptions = ArrayHelper::merge(['responsive' => true], $this->dataTablesOptions);
         }
 
         $chartSeries = [];
@@ -137,7 +139,7 @@ class StatReport extends Widget {
         //$js = "var dataTable{$this->id} = $('#{$this->id} .grid-view table').eq(0).dataTable({ ajax: '{$this->url}' });\n";
         $chartSeries = Json::encode($chartSeries);
         $highchartsOptions = Json::encode($highcharts->options, JSON_NUMERIC_CHECK);
-        $tableOptions = Json::encode($this->tableOptions, JSON_NUMERIC_CHECK);
+        $tableOptions = Json::encode($this->dataTablesOptions, JSON_NUMERIC_CHECK);
         $js = "var chartSeries{$this->id} = [{$chartSeries}];\n";
         $js .= "$('#{$this->id}').statReport({
             table: $('#{$this->id} > .grid-view > table').eq(0),
