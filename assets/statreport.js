@@ -49,25 +49,32 @@
                 params: {},
                 chartSeries: [],
                 chartOptions: {},
-                tableOptions: {}
+                dataTablesOptions: {},
+                onError: null
             };
 
             options = $.extend(defaults, options);
             self.data('stat-report', options);
 
-            var tableOptions = options.tableOptions;
-            tableOptions.ajax = {
+            var dataTablesOptions = options.dataTablesOptions;
+            dataTablesOptions.ajax = {
                 'url': buildUrl.call(self),
                 'dataSrc': 'table'
             };
 
-            options.table.on('preXhr.dt', function (e, settings, data) {
+            options.table.on('preXhr.dt', function(e, settings, data) {
+                self.data('loading', true);
                 ajaxMask.call(self);
             });
-            var dataTable = options.table.dataTable(tableOptions);
+            var dataTable = options.table.dataTable(dataTablesOptions);
             self.data('data-tables', dataTable);
 
+            if(options.onError != null) {
+                dataTable.on('error.dt', options.onError);
+            }
             dataTable.on('xhr.dt', function(e, settings, json) {
+                self.data('loading', false);
+
                 var data = options.chartSeries.concat(json.chart);
                 console.log(data);  // 调试用
                 var highchartsOptions = options.chartOptions;
@@ -101,11 +108,17 @@
 
             self.find('div.stat-report-view[data-view-role!="' + type + '"]').hide();
             self.find('div.stat-report-view[data-view-role="' + type + '"]').show();
+
+            if(type == 'chart') {
+                $(window).trigger('resize');
+            }
         },
 
         load: function() {
             var self = this;
-            self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
+            if( ! self.data('loading')) {
+                self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
+            }
         }
     };
 

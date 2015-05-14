@@ -26,6 +26,7 @@ class StatReport extends Widget {
     public $toggleBtnChartLabel = '<i class="fa fa-line-chart"></i>';
     public $bootstrap = true;
     public $responsive = true;
+    public $onError;
 
     const VIEW_CHART = 'chart';
     const VIEW_TABLE = 'table';
@@ -135,18 +136,20 @@ class StatReport extends Widget {
 
         //$js = "var dataTable{$this->id} = $('#{$this->id} .grid-view table').eq(0).dataTable({ ajax: '{$this->url}' });\n";
         $chartSeries = Json::encode($chartSeries);
-        $highchartsOptions = Json::encode($highcharts->options, JSON_NUMERIC_CHECK);
-        $tableOptions = Json::encode($this->dataTablesOptions, JSON_NUMERIC_CHECK);
+        $onError = ! is_null($this->onError) ? $this->onError : 'null';
         $js = "var chartSeries{$this->id} = [{$chartSeries}];\n";
-        $js .= "$('#{$this->id}').statReport({
-            table: $('#{$this->id} > .grid-view > table').eq(0),
-            chart: $('#{$highcharts->getId()}'),
-            url: '{$this->url}',
-            params: {$this->encodeParams()},
-            tableOptions: {$tableOptions},
-            chartSeries: chartSeries{$this->id},
-            chartOptions: {$highchartsOptions}
-        });\n";
+
+        $options = Json::encode([
+            'table' => new JsExpression("$('#{$this->id} > .grid-view > table').eq(0)"),
+            'chart' => new JsExpression("$('#{$highcharts->getId()}')"),
+            'url' => $this->url,
+            'params' => $this->encodeParams(),
+            'dataTablesOptions' => $this->dataTablesOptions,
+            'chartSeries' => new JsExpression("chartSeries{$this->id}"),
+            'chartOptions' => $highcharts->options,
+            'onError' => $onError,
+        ], JSON_NUMERIC_CHECK);
+        $js .= "$('#{$this->id}').statReport({$options});\n";
         $this->view->registerJs($js);
 
         parent::run();
@@ -162,6 +165,6 @@ class StatReport extends Widget {
                 $params[$key] = $param;
             }
         }
-        return Json::encode($params);
+        return $params;
     }
 }
