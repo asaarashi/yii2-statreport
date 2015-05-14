@@ -1,0 +1,19 @@
+.ajax-mask {
+    background: #FFF;
+}
+
+.ajax-mask .loading {
+    width: 96px;
+    height: 64px;
+    background: url('./loading_mask.gif') center center no-repeat;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    position: relative;
+    left:50%;
+    margin-left:-25px;
+    top:25%;
+    margin-top: -25px;
+    opacity: 0.9;
+    -moz-opacity: 0.9;
+}

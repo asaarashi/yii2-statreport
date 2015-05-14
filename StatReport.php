@@ -41,6 +41,8 @@ class StatReport extends Widget {
         } else {
             $this->id = $this->htmlOptions['id'] = $this->getId();
         }
+        Html::addCssClass($this->htmlOptions, 'stat-report-container');
+        Html::addCssClass($this->captionOptions, 'statreport-caption');
 
         foreach($this->series as $i => $s) {
             $this->series[$i] = Yii::createObject(array_merge([
@@ -55,14 +57,9 @@ class StatReport extends Widget {
         echo Html::beginTag('div', $this->htmlOptions);
 
         if($this->showCaption) {
-            if( ! isset($this->captionOptions['class'])) {
-                $this->captionOptions['class'] = 'statreport-caption';
-            } else {
-                $this->captionOptions['class'] = 'statreport-caption '.$this->captionOptions['class'];
-            }
             echo Html::beginTag('div', ArrayHelper::merge(
                 [
-                    'class' => 'statreport-caption'.(isset($this->captionOptions['class']) ? ' '.$this->captionOptions['class'] : '')
+                    'class' => $this->captionOptions['class']
                 ],
                 $this->captionOptions
             ));

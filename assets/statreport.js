@@ -18,6 +18,27 @@
         return url;
     };
 
+    var ajaxMask = function(options) {
+        var settings = $.extend({
+            stop: false
+        }, options);
+
+        if (!settings.stop) {
+            var loadingDiv = $('<div class="ajax-mask"><div class="loading"></div></div>')
+                .css({
+                    'position': 'absolute',
+                    'top': 0,
+                    'left':0,
+                    'width':'100%',
+                    'height':'100%'
+                });
+
+            $(this).css({ 'position':'relative' }).append(loadingDiv);
+        } else {
+            $(this).find('.ajax-mask').remove();
+        }
+    };
+
     var methods = {
         init: function(options) {
             var self = this;
@@ -39,6 +60,10 @@
                 'url': buildUrl.call(self),
                 'dataSrc': 'table'
             };
+
+            options.table.on('preXhr.dt', function (e, settings, data) {
+                ajaxMask.call(self);
+            });
             var dataTable = options.table.dataTable(tableOptions);
             self.data('data-tables', dataTable);
 
@@ -54,6 +79,8 @@
                 if(typeof json.caption != 'undefined') {
                     self.find('div.statreport-caption').html(json.caption);
                 }
+
+                ajaxMask.call(self, { stop: true });
             });
 
             self.find('div.toggle-view-buttons > button').click(function() {
@@ -98,4 +125,5 @@
 
         return method.apply(this, Array.prototype.slice.call(arguments, isDefaultMethod ? 0 : 1, arguments.length));
     };
+
 })(jQuery);
