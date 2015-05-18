@@ -1,7 +1,7 @@
 (function($) {
     var buildUrl = function() {
         var self = this;
-        var options = self.data('stat-report');
+        var options = self.data('statreport');
 
         var params = {};
         $.each(options.params, function(key, param) {
@@ -54,7 +54,7 @@
             };
 
             options = $.extend(defaults, options);
-            self.data('stat-report', options);
+            self.data('statreport', options);
 
             var dataTablesOptions = options.dataTablesOptions;
             dataTablesOptions.ajax = {
@@ -108,8 +108,8 @@
             self.find('div.toggle-view-buttons > button').removeClass('btn-primary');
             self.find('div.toggle-view-buttons > button[value="' + type  + '"]').addClass('btn-primary');
 
-            self.find('div.stat-report-view[data-view-role!="' + type + '"]').hide();
-            self.find('div.stat-report-view[data-view-role="' + type + '"]').show();
+            self.find('div.statreport-view[data-view-role!="' + type + '"]').hide();
+            self.find('div.statreport-view[data-view-role="' + type + '"]').show();
 
             if(type == 'chart') {
                 $(window).trigger('resize');

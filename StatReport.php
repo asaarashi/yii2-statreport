@@ -83,7 +83,7 @@ class StatReport extends Widget {
         $highcharts = Highcharts::begin([
             'htmlOptions' => [
                 'data-view-role' => static::VIEW_CHART,
-                'class' => 'stat-report-view',
+                'class' => 'statreport-view',
             ],
             'options' => $this->chartOptions,
         ]);
@@ -100,7 +100,7 @@ class StatReport extends Widget {
             ]),
             'options' => [
                 'data-view-role' => static::VIEW_TABLE,
-                'class' => 'grid-view stat-report-view'
+                'class' => 'grid-view statreport-view'
             ],
             'tableOptions' => $this->tableOptions,
         ]);
