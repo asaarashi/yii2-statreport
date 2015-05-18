@@ -5,12 +5,12 @@ namespace thrieu\statreport;
 use Yii;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 class Response extends Object {
     public $data;
     public $dataSeries;
     public $caption;
+
 
     public function init() {
         foreach($this->dataSeries as $i => $s) {
@@ -20,7 +20,7 @@ class Response extends Object {
         }
     }
 
-    public function toJson() {
+    public function toArray() {
         $response = [];
         $response['table'] = [];
         $response['chart'] = [];
@@ -40,6 +40,6 @@ class Response extends Object {
             $response['chart'][] = $chartRow;
         }
 
-        return Json::encode($response);
+        return $response;
     }
 }

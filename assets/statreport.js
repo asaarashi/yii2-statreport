@@ -69,22 +69,24 @@
             var dataTable = options.table.dataTable(dataTablesOptions);
             self.data('data-tables', dataTable);
 
-            if(options.onError != null) {
+            if(options.onError !== null) {
                 dataTable.on('error.dt', options.onError);
             }
             dataTable.on('xhr.dt', function(e, settings, json) {
                 self.data('loading', false);
 
-                var data = options.chartSeries.concat(json.chart);
-                console.log(data);  // 调试用
-                var highchartsOptions = options.chartOptions;
-                highchartsOptions.data = {
-                    rows: data
-                };
-                options.chart.highcharts(highchartsOptions);
+                if(json != null) {
+                    var data = options.chartSeries.concat(json.chart);
+                    console.log(data);  // 调试用
+                    var highchartsOptions = options.chartOptions;
+                    highchartsOptions.data = {
+                        rows: data
+                    };
+                    options.chart.highcharts(highchartsOptions);
 
-                if(typeof json.caption != 'undefined') {
-                    self.find('div.statreport-caption').html(json.caption);
+                    if(typeof json.caption != 'undefined') {
+                        self.find('div.statreport-caption').html(json.caption);
+                    }
                 }
 
                 ajaxMask.call(self, { stop: true });

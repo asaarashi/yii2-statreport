@@ -42,7 +42,7 @@ class StatReport extends Widget {
         } else {
             $this->id = $this->htmlOptions['id'] = $this->getId();
         }
-        Html::addCssClass($this->htmlOptions, 'stat-report-container');
+        Html::addCssClass($this->htmlOptions, 'statreport-container');
         Html::addCssClass($this->captionOptions, 'statreport-caption');
 
         foreach($this->series as $i => $s) {
@@ -136,7 +136,7 @@ class StatReport extends Widget {
 
         //$js = "var dataTable{$this->id} = $('#{$this->id} .grid-view table').eq(0).dataTable({ ajax: '{$this->url}' });\n";
         $chartSeries = Json::encode($chartSeries);
-        $onError = ! is_null($this->onError) ? $this->onError : 'null';
+        $onError = ! is_null($this->onError) ? $this->onError : null;
         $js = "var chartSeries{$this->id} = [{$chartSeries}];\n";
 
         $options = Json::encode([
