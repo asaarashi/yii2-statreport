@@ -27,6 +27,10 @@ class StatReport extends Widget {
     public $bootstrap = true;
     public $responsive = true;
     public $onError;
+    public $highcharts;
+    public $chartSeries = [];
+    public $columns = [];
+    public $buttonGroupOptions;
 
     const VIEW_CHART = 'chart';
     const VIEW_TABLE = 'table';
@@ -44,13 +48,9 @@ class StatReport extends Widget {
         }
         Html::addCssClass($this->htmlOptions, 'statreport-container');
         Html::addCssClass($this->captionOptions, 'statreport-caption');
-
-        foreach($this->series as $i => $s) {
-            $this->series[$i] = Yii::createObject(array_merge([
-                'class' => Series::className(),
-            ], $s));
-        }
-
+        $this->initSeries();
+        $this->initColumns();
+        $this->initButtonOptions($this->buttonGroupOptions);
     }
 
     public function run() {
@@ -68,53 +68,10 @@ class StatReport extends Widget {
             echo Html::endTag('div');
         }
 
-        $columns = [];
-        foreach($this->series as $s) {
-            $column = [];
-            $column['header'] = $s->header;
-            $column['footer'] = $s->footer;
-            $column['visible'] = $s->visible;
-            $column['headerOptions'] = $s->headerOptions;
-            $column['footerOptions'] = $s->footerOptions;
+        $this->renderHighcharts();
+        $this->renderDataTablesGridView();
 
-            $columns[] = $column;
-        }
-
-        $highcharts = Highcharts::begin([
-            'htmlOptions' => [
-                'data-view-role' => static::VIEW_CHART,
-                'class' => 'statreport-view',
-            ],
-            'options' => $this->chartOptions,
-        ]);
-        $highcharts->scripts = ['highcharts', 'modules/data'];
-        $highcharts->callback = 'createHighcharts'.$this->getId();
-        $highcharts->end();
-
-        echo DataTablesGridView::widget([
-            'filterModel' => null,
-            'emptyText' => null,
-            'columns' => $columns,
-            'dataProvider' => new ArrayDataProvider([
-                'pagination' => false,
-            ]),
-            'options' => [
-                'data-view-role' => static::VIEW_TABLE,
-                'class' => 'grid-view statreport-view'
-            ],
-            'tableOptions' => $this->tableOptions,
-        ]);
-
-        echo ButtonGroup::widget([
-            'options' => [
-                'class' => 'toggle-view-buttons',
-            ],
-            'buttons' => [
-                ['label' => $this->toggleBtnChartLabel, 'options' => ['value' => static::VIEW_CHART]],
-                ['label' => $this->toggleBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE]],
-            ],
-            'encodeLabels' => false,
-        ]);
+        echo ButtonGroup::widget($this->buttonGroupOptions);
 
         echo Html::endTag('div');
 
@@ -127,31 +84,9 @@ class StatReport extends Widget {
             $this->dataTablesOptions = ArrayHelper::merge(['responsive' => true], $this->dataTablesOptions);
         }
 
-        $chartSeries = [];
-        foreach($this->series as $s) {
-            if($s->isInChart) {
-                $chartSeries[] = $s->header;
-            }
-        }
+        $this->renderChartSeries();
 
-        //$js = "var dataTable{$this->id} = $('#{$this->id} .grid-view table').eq(0).dataTable({ ajax: '{$this->url}' });\n";
-        $chartSeries = Json::encode($chartSeries);
-        $onError = ! is_null($this->onError) ? $this->onError : null;
-        $js = "var chartSeries{$this->id} = [{$chartSeries}];\n";
-
-        $options = Json::encode([
-            'table' => new JsExpression("$('#{$this->id} > .grid-view > table').eq(0)"),
-            'chart' => new JsExpression("$('#{$highcharts->getId()}')"),
-            'url' => $this->url,
-            'params' => $this->encodeParams(),
-            'dataTablesOptions' => $this->dataTablesOptions,
-            'chartSeries' => new JsExpression("chartSeries{$this->id}"),
-            'chartOptions' => $highcharts->options,
-            'onError' => $onError,
-        ], JSON_NUMERIC_CHECK);
-        $js .= "$('#{$this->id}').statReport({$options});\n";
-        $this->view->registerJs($js);
-
+        $this->renderJavaScript();
         parent::run();
     }
 
@@ -166,5 +101,95 @@ class StatReport extends Widget {
             }
         }
         return $params;
+    }
+
+    public function renderChartSeries() {
+        foreach($this->series as $s) {
+            if($s->isInChart) {
+                $this->chartSeries[] = $s->header;
+            }
+        }
+        $this->chartSeries = Json::encode($this->chartSeries);
+    }
+
+    public function renderJavaScript() {
+        $js = "var chartSeries{$this->id} = [{$this->chartSeries}];\n";
+        $options = Json::encode([
+            'table' => new JsExpression("$('#{$this->id} > .grid-view > table').eq(0)"),
+            'chart' => new JsExpression("$('#{$this->highcharts->getId()}')"),
+            'url' => $this->url,
+            'params' => $this->encodeParams(),
+            'dataTablesOptions' => $this->dataTablesOptions,
+            'chartSeries' => new JsExpression("chartSeries{$this->id}"),
+            'chartOptions' => $this->highcharts->options,
+            'onError' => (! is_null($this->onError) ? $this->onError : null),
+        ], JSON_NUMERIC_CHECK);
+        $js .= "$('#{$this->id}').statReport({$options});\n";
+        $this->view->registerJs($js);
+    }
+
+    public function renderHighcharts() {
+        $this->highcharts = Highcharts::begin([
+            'htmlOptions' => [
+                'data-view-role' => static::VIEW_CHART,
+                'class' => 'statreport-view',
+            ],
+            'options' => $this->chartOptions,
+        ]);
+            $this->highcharts->scripts = ['highcharts', 'modules/data'];
+            $this->highcharts->callback = 'createHighcharts' . $this->getId();
+        $this->highcharts->end();
+    }
+
+    public function renderDataTablesGridView() {
+        echo DataTablesGridView::widget([
+            'filterModel' => null,
+            'emptyText' => null,
+            'columns' => $this->columns,
+            'dataProvider' => new ArrayDataProvider([
+                    'pagination' => false,
+                ]),
+            'options' => [
+                'data-view-role' => static::VIEW_TABLE,
+                'class' => 'grid-view statreport-view'
+            ],
+            'tableOptions' => $this->tableOptions,
+        ]);
+    }
+
+    public function initSeries() {
+        foreach($this->series as $i => $s) {
+            $this->series[$i] = Yii::createObject(array_merge([
+                'class' => Series::className(),
+            ], $s));
+        }
+    }
+
+    public function initColumns() {
+        foreach($this->series as $s) {
+            $column = [];
+            $column['header'] = $s->header;
+            $column['footer'] = $s->footer;
+            $column['visible'] = $s->visible;
+            $column['headerOptions'] = $s->headerOptions;
+            $column['footerOptions'] = $s->footerOptions;
+
+            $this->columns[] = $column;
+        }
+    }
+
+    public function initButtonOptions(&$options) {
+        if (!isset($options['options']['class'])){
+            $options['options']['class'] = 'toggle-view-buttons';
+        }
+        if (!isset($options['options']['buttons'])){
+            $options['options']['buttons'] = [
+                ['label' => $this->toggleBtnChartLabel, 'options' => ['value' => static::VIEW_CHART]],
+                ['label' => $this->toggleBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE]],
+            ];
+        }
+        if (!isset($options['options']['encodeLabels'])){
+            $options['options']['encodeLabels'] = false;
+        }
     }
 }

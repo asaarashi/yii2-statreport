@@ -5,7 +5,15 @@
 
         var params = {};
         $.each(options.params, function(key, param) {
-            params[key] = param instanceof $ ? param.val() : param;
+            if(param instanceof $) {
+                if(param.is("input") && param.attr("type") == "checkbox") {
+                    params[key] = param.filter(":checked").val();
+                } else {
+                    params[key] = param.val();
+                }
+            } else {
+                params[key] = param;
+            }
         });
 
         var query = $.param(params);
@@ -41,6 +49,8 @@
 
     var methods = {
         init: function(options) {
+            $.fn.dataTable.ext.errMode = 'none';
+
             var self = this;
             var defaults = {
                 table: null,
@@ -62,11 +72,10 @@
                 'dataSrc': 'table'
             };
 
-            options.table.on('preXhr.dt', function(e, settings, data) {
+            var dataTable = options.table.on('preXhr.dt', function(e, settings, data) {
                 self.data('loading', true);
                 ajaxMask.call(self);
-            });
-            var dataTable = options.table.dataTable(dataTablesOptions);
+            }).dataTable(dataTablesOptions);
             self.data('data-tables', dataTable);
 
             if(options.onError !== null) {
