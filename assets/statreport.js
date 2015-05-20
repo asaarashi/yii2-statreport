@@ -60,7 +60,9 @@
                 chartSeries: [],
                 chartOptions: {},
                 dataTablesOptions: {},
-                onError: null
+                onError: null,
+                onSuccess: null,
+                onBeforeRequest: null
             };
 
             options = $.extend(defaults, options);
@@ -73,16 +75,21 @@
             };
 
             var dataTable = options.table.on('preXhr.dt', function(e, settings, data) {
-                self.data('loading', true);
+                self.data('statreport-loading', true);
                 ajaxMask.call(self);
-            }).dataTable(dataTablesOptions);
+            });
+            if(options.onBeforeRequest != null) {
+                dataTable.on('preXhr.dt', options.onBeforeRequest);
+            }
+            dataTable.dataTable(dataTablesOptions);
+
             self.data('data-tables', dataTable);
 
             if(options.onError !== null) {
                 dataTable.on('error.dt', options.onError);
             }
             dataTable.on('xhr.dt', function(e, settings, json) {
-                self.data('loading', false);
+                self.data('statreport-loading', false);
 
                 if(json != null) {
                     var data = options.chartSeries.concat(json.chart);
@@ -100,6 +107,9 @@
 
                 ajaxMask.call(self, { stop: true });
             });
+            if(options.onSuccess !== null) {
+                dataTable.on('xhr.dt', options.onSuccess);
+            }
 
             self.find('div.toggle-view-buttons > button').click(function() {
                 self.statReport('view', $(this).val());
@@ -127,9 +137,7 @@
 
         load: function() {
             var self = this;
-            if( ! self.data('loading')) {
-                self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
-            }
+            self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
         }
     };
 

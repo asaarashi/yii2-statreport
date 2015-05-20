@@ -27,6 +27,8 @@ class StatReport extends Widget {
     public $bootstrap = true;
     public $responsive = true;
     public $onError;
+    public $onSuccess;
+    public $onBeforeRequest;
     public $highcharts;
     public $chartSeries = [];
     public $columns = [];
@@ -122,7 +124,9 @@ class StatReport extends Widget {
             'dataTablesOptions' => $this->dataTablesOptions,
             'chartSeries' => new JsExpression("chartSeries{$this->id}"),
             'chartOptions' => $this->highcharts->options,
-            'onError' => (! is_null($this->onError) ? $this->onError : null),
+            'onError' => ( ! is_null($this->onError) ? $this->onError : null),
+            'onSuccess' => ( ! is_null($this->onSuccess) ? $this->onSuccess : null),
+            'onBeforeRequest' => ( ! is_null($this->onBeforeRequest) ? $this->onBeforeRequest : null),
         ], JSON_NUMERIC_CHECK);
         $js .= "$('#{$this->id}').statReport({$options});\n";
         $this->view->registerJs($js);
