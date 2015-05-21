@@ -62,6 +62,7 @@
                 dataTablesOptions: {},
                 onError: null,
                 onSuccess: null,
+                onFailure: null,
                 onBeforeRequest: null
             };
 
@@ -92,16 +93,21 @@
                 self.data('statreport-loading', false);
 
                 if(json != null) {
-                    var data = options.chartSeries.concat(json.chart);
-                    console.log(data);  // 调试用
-                    var highchartsOptions = options.chartOptions;
-                    highchartsOptions.data = {
-                        rows: data
-                    };
-                    options.chart.highcharts(highchartsOptions);
+                    if(json.status == 0) {
+                        var data = options.chartSeries.concat(json.chart);
+                        var highchartsOptions = options.chartOptions;
+                        highchartsOptions.data = {
+                            rows: data
+                        };
+                        options.chart.highcharts(highchartsOptions);
 
-                    if(typeof json.caption != 'undefined') {
-                        self.find('div.statreport-caption').html(json.caption);
+                        if(typeof json.caption != 'undefined') {
+                            self.find('div.statreport-caption').html(json.caption);
+                        }
+                    } else {
+                        if(options.onFailure != null) {
+                            options.onFailure(e, settings, json);
+                        }
                     }
                 }
 

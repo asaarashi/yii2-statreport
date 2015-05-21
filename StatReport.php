@@ -26,13 +26,15 @@ class StatReport extends Widget {
     public $toggleBtnChartLabel = '<i class="fa fa-line-chart"></i>';
     public $bootstrap = true;
     public $responsive = true;
-    public $onError;
-    public $onSuccess;
-    public $onBeforeRequest;
     public $highcharts;
     public $chartSeries = [];
     public $columns = [];
     public $buttonGroupOptions;
+    // Handlers
+    public $onSuccess;
+    public $onFailure;
+    public $onBeforeRequest;
+    public $onError;
 
     const VIEW_CHART = 'chart';
     const VIEW_TABLE = 'table';
@@ -124,9 +126,10 @@ class StatReport extends Widget {
             'dataTablesOptions' => $this->dataTablesOptions,
             'chartSeries' => new JsExpression("chartSeries{$this->id}"),
             'chartOptions' => $this->highcharts->options,
-            'onError' => ( ! is_null($this->onError) ? $this->onError : null),
             'onSuccess' => ( ! is_null($this->onSuccess) ? $this->onSuccess : null),
+            'onFailure' => ( ! is_null($this->onFailure) ? $this->onFailure : null),
             'onBeforeRequest' => ( ! is_null($this->onBeforeRequest) ? $this->onBeforeRequest : null),
+            'onError' => ( ! is_null($this->onError) ? $this->onError : null),
         ], JSON_NUMERIC_CHECK);
         $js .= "$('#{$this->id}').statReport({$options});\n";
         $this->view->registerJs($js);
