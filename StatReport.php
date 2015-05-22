@@ -22,19 +22,20 @@ class StatReport extends Widget {
     public $showCaption = true;
     public $captionOptions = [];
     public $params = [];
-    public $toggleBtnTableLabel = '<i class="fa fa-table"></i>';
-    public $toggleBtnChartLabel = '<i class="fa fa-line-chart"></i>';
+    public $switchBtnTableLabel = '<i class="fa fa-table"></i>';
+    public $switchBtnChartLabel = '<i class="fa fa-line-chart"></i>';
     public $bootstrap = true;
     public $responsive = true;
     public $highcharts;
     public $chartSeries = [];
     public $columns = [];
-    public $buttonGroupOptions;
     // Handlers
     public $onSuccess;
     public $onFailure;
     public $onBeforeRequest;
     public $onError;
+
+    protected $buttonGroupOptions = [];
 
     const VIEW_CHART = 'chart';
     const VIEW_TABLE = 'table';
@@ -54,7 +55,7 @@ class StatReport extends Widget {
         Html::addCssClass($this->captionOptions, 'statreport-caption');
         $this->initSeries();
         $this->initColumns();
-        $this->initButtonOptions($this->buttonGroupOptions);
+        $this->initButtonOptions();
     }
 
     public function run() {
@@ -185,18 +186,12 @@ class StatReport extends Widget {
         }
     }
 
-    public function initButtonOptions(&$options) {
-        if (!isset($options['options']['class'])){
-            $options['options']['class'] = 'toggle-view-buttons';
-        }
-        if (!isset($options['options']['buttons'])){
-            $options['options']['buttons'] = [
-                ['label' => $this->toggleBtnChartLabel, 'options' => ['value' => static::VIEW_CHART]],
-                ['label' => $this->toggleBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE]],
-            ];
-        }
-        if (!isset($options['options']['encodeLabels'])){
-            $options['options']['encodeLabels'] = false;
-        }
+    public function initButtonOptions() {
+        $this->buttonGroupOptions['options']['class'] = 'statreport-switcher-buttons';
+        $this->buttonGroupOptions['buttons'] = [
+            ['label' => $this->switchBtnChartLabel, 'options' => ['value' => static::VIEW_CHART]],
+            ['label' => $this->switchBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE]],
+        ];
+        $this->buttonGroupOptions['encodeLabels'] = false;
     }
 }

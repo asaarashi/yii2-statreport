@@ -117,7 +117,7 @@
                 dataTable.on('xhr.dt', options.onSuccess);
             }
 
-            self.find('div.toggle-view-buttons > button').click(function() {
+            self.find('div.statreport-switcher-buttons > button').click(function() {
                 self.statReport('view', $(this).val());
             });
             self.statReport('view', 'chart');
@@ -130,8 +130,8 @@
 
             self.data('view', type);
 
-            self.find('div.toggle-view-buttons > button').removeClass('btn-primary');
-            self.find('div.toggle-view-buttons > button[value="' + type  + '"]').addClass('btn-primary');
+            self.find('div.statreport-switcher-buttons > button').removeClass('btn-primary');
+            self.find('div.statreport-switcher-buttons > button[value="' + type  + '"]').addClass('btn-primary');
 
             self.find('div.statreport-view[data-view-role!="' + type + '"]').hide();
             self.find('div.statreport-view[data-view-role="' + type + '"]').show();
