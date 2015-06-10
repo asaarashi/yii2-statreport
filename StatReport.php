@@ -29,6 +29,7 @@ class StatReport extends Widget {
     public $highcharts;
     public $chartSeries = [];
     public $columns = [];
+    public $autoloading = true;
     // Handlers
     public $onSuccess;
     public $onFailure;
@@ -131,6 +132,7 @@ class StatReport extends Widget {
             'onFailure' => ( ! is_null($this->onFailure) ? $this->onFailure : null),
             'onBeforeRequest' => ( ! is_null($this->onBeforeRequest) ? $this->onBeforeRequest : null),
             'onError' => ( ! is_null($this->onError) ? $this->onError : null),
+            'autoloading' => $this->autoloading,
         ], JSON_NUMERIC_CHECK);
         $js .= "$('#{$this->id}').statReport({$options});\n";
         $this->view->registerJs($js);
@@ -144,8 +146,8 @@ class StatReport extends Widget {
             ],
             'options' => $this->chartOptions,
         ]);
-            $this->highcharts->scripts = ['highcharts', 'modules/data'];
-            $this->highcharts->callback = 'createHighcharts' . $this->getId();
+        $this->highcharts->scripts = ['highcharts', 'modules/data'];
+        $this->highcharts->callback = 'createHighcharts' . $this->getId();
         $this->highcharts->end();
     }
 

@@ -63,11 +63,28 @@
                 onError: null,
                 onSuccess: null,
                 onFailure: null,
-                onBeforeRequest: null
+                onBeforeRequest: null,
+                autoloading: true
             };
 
             options = $.extend(defaults, options);
             self.data('statreport', options);
+
+
+            self.find('div.statreport-switcher-buttons > button').click(function() {
+                self.statReport('view', $(this).val());
+            });
+            self.statReport('view', 'chart');
+
+            if(options.autoloading) {
+                self.statReport('construct');
+            }
+        },
+
+        construct: function() {
+            var self = this;
+
+            var options = self.data('statreport');
 
             var dataTablesOptions = options.dataTablesOptions;
             dataTablesOptions.ajax = {
@@ -117,11 +134,7 @@
                 dataTable.on('xhr.dt', options.onSuccess);
             }
 
-            self.find('div.statreport-switcher-buttons > button').click(function() {
-                self.statReport('view', $(this).val());
-            });
-            self.statReport('view', 'chart');
-
+            self.data('constructed', true);
             return self;
         },
 
@@ -143,7 +156,14 @@
 
         load: function() {
             var self = this;
-            self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
+            if(self.data('statreport-loading')) {
+                return ;
+            }
+            if( ! self.data('constructed')) {
+                self.statReport('construct');
+            } else {
+                self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
+            }
         }
     };
 
