@@ -3,6 +3,7 @@
 namespace thrieu\statreport;
 
 use Yii;
+use yii\base\InvalidParamException;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
 
@@ -33,13 +34,22 @@ class Response extends Object {
             if($this->caption) {
                 $response['caption'] = $this->caption;
             }
-            foreach($this->data as $value) {
+            foreach($this->data as $row) {
                 $tableRow = [];
                 $chartRow = [];
                 foreach($this->dataSeries as $s) {
-                    $tableRow[] = ArrayHelper::getValue($value, $s->name);
+                    if (!is_null($s->value)) {
+                        if (!is_object($s->value) || !$s->value instanceof \Closure) {
+                            throw new InvalidParamException('Value is not a Closure.');
+                        }
+                        $row_value = $s->value($row);
+                    } else {
+                        $row_value = ArrayHelper::getValue($row, $s->name);
+                    }
+
+                    $tableRow[] = $row_value;
                     if($s->isInChart) {
-                        $chartRow[] = ArrayHelper::getValue($value, $s->name);
+                        $chartRow[] = $row_value;
                     }
                 }
                 $response['table'][] = $tableRow;
