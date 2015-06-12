@@ -38,18 +38,15 @@ class Response extends Object {
                 $tableRow = [];
                 $chartRow = [];
                 foreach($this->dataSeries as $s) {
-                    if (!is_null($s->value)) {
-                        if (!is_object($s->value) || !$s->value instanceof \Closure) {
-                            throw new InvalidParamException('Value is not a Closure.');
-                        }
-                        $row_value = $s->value($row);
+                    if ($s->value !== null) {
+                        $value = call_user_func($s->value, $row);
                     } else {
-                        $row_value = ArrayHelper::getValue($row, $s->name);
+                        $value = ArrayHelper::getValue($row, $s->name);
                     }
 
-                    $tableRow[] = $row_value;
+                    $tableRow[] = $value;
                     if($s->isInChart) {
-                        $chartRow[] = $row_value;
+                        $chartRow[] = $value;
                     }
                 }
                 $response['table'][] = $tableRow;

@@ -15,9 +15,4 @@ class DataSeries extends Object {
             throw new InvalidConfigException('The "name" or "value" property must be specified.');
         }
     }
-
-    public function __call($name, $args)
-    {
-        return call_user_func_array($this->$name, $args);
-    }
 }
