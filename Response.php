@@ -3,7 +3,7 @@
 namespace thrieu\statreport;
 
 use Yii;
-use yii\base\InvalidParamException;
+use yii\helpers\Html;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
 
@@ -44,9 +44,9 @@ class Response extends Object {
                         $value = ArrayHelper::getValue($row, $s->name);
                     }
 
-                    $tableRow[] = $value;
+                    $tableRow[] = Html::encode($value);
                     if($s->isInChart) {
-                        $chartRow[] = $value;
+                        $chartRow[] = Html::encode($value);
                     }
                 }
                 $response['table'][] = $tableRow;

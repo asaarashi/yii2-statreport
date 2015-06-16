@@ -66,10 +66,8 @@
                 onBeforeRequest: null,
                 autoloading: true
             };
-
             options = $.extend(defaults, options);
             self.data('statreport', options);
-
 
             self.find('div.statreport-switcher-buttons > button').click(function() {
                 self.statReport('view', $(this).val());
