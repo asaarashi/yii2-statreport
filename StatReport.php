@@ -7,7 +7,7 @@ use yii\bootstrap\ButtonGroup;
 use yii\helpers\Html;
 use yii\data\ArrayDataProvider;
 use yii\base\InvalidConfigException;
-use miloschuman\highcharts\Highcharts;
+
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
@@ -30,6 +30,7 @@ class StatReport extends Widget {
     public $chartSeries = [];
     public $columns = [];
     public $autoloading = true;
+    public $highstock = false;
     // Handlers
     public $onSuccess;
     public $onFailure;
@@ -139,14 +140,16 @@ class StatReport extends Widget {
     }
 
     public function renderHighcharts() {
-        $this->highcharts = Highcharts::begin([
+        $class = 'miloschuman\highcharts\\';
+        $class .= ! $this->highstock ? 'Highcharts' : 'Highstock';
+        $this->highcharts = $class::begin([
             'htmlOptions' => [
                 'data-view-role' => static::VIEW_CHART,
                 'class' => 'statreport-view',
             ],
             'options' => $this->chartOptions,
         ]);
-        $this->highcharts->scripts = ['highcharts', 'modules/data'];
+        $this->highcharts->scripts = [ ! $this->highstock ? 'highcharts' : 'highstock', 'modules/data'];
         $this->highcharts->callback = 'createHighcharts' . $this->getId();
         $this->highcharts->end();
     }
