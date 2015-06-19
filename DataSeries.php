@@ -9,6 +9,7 @@ class DataSeries extends Object {
     public $name;
     public $isInChart = true;
     public $value;
+    public $encode = true;
 
     public function init() {
         if( ! $this->name && ! $this->value) {

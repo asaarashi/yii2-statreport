@@ -1,9 +1,9 @@
 (function($) {
-    var buildUrl = function() {
+    var buildUrl = function(params) {
         var self = this;
         var options = self.data('statreport');
 
-        var params = {};
+        params = typeof params == "undefined" ? {} : params;
         $.each(options.params, function(key, param) {
             if(param instanceof $) {
                 if(param.is("input") && param.attr("type") == "checkbox") {
@@ -16,12 +16,14 @@
             }
         });
 
-        var query = $.param(params);
-        var url = '';
-        if (options.url.indexOf("?") != -1){
-            url = options.url + '&' + query;
-        } else {
-            url = options.url + '?' + query;
+        var url = options.url;
+        if( ! $.isEmptyObject(params)) {
+            var query = $.param(params);
+            if (options.url.indexOf("?") != -1){
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
         }
         return url;
     };
@@ -79,14 +81,14 @@
             }
         },
 
-        construct: function() {
+        construct: function(params) {
             var self = this;
 
             var options = self.data('statreport');
 
             var dataTablesOptions = options.dataTablesOptions;
             dataTablesOptions.ajax = {
-                'url': buildUrl.call(self),
+                'url': buildUrl.call(self, params),
                 'dataSrc': 'table'
             };
 
@@ -152,15 +154,15 @@
             }
         },
 
-        load: function() {
+        load: function(params) {
             var self = this;
             if(self.data('statreport-loading')) {
                 return ;
             }
             if( ! self.data('constructed')) {
-                self.statReport('construct');
+                self.statReport('construct', params);
             } else {
-                self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
+                self.data('data-tables').api().ajax.url(buildUrl.call(self, params)).load();
             }
         }
     };

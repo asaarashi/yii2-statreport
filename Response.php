@@ -44,9 +44,10 @@ class Response extends Object {
                         $value = ArrayHelper::getValue($row, $s->name);
                     }
 
-                    $tableRow[] = Html::encode($value);
+                    $value = $s->encode ? Html::encode($value) : $value;
+                    $tableRow[] = $value;
                     if($s->isInChart) {
-                        $chartRow[] = Html::encode($value);
+                        $chartRow[] = $value;
                     }
                 }
                 $response['table'][] = $tableRow;
