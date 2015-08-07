@@ -21,6 +21,7 @@
     "bower-asset/datatables": "*",
     "bower-asset/datatables-bootstrap3": "*",
     "bower-asset/datatables-responsive": "*",
+    "bower-asset/jquery.simplePagination": "*",
     "miloschuman/yii2-highcharts-widget": "*"
   },
   "autoload": {
