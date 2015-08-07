@@ -124,13 +124,12 @@
                             options.chart.highcharts(highchartsOptions);
                         };
                         if(options.enablePagination) {
-                            //self.data('statreport').chartOptions.data.rows;
-                            //console.log(self.data('statreport').chartOptions.data.rows);
                             var countItems = data.length - 1;
                             var totalPages = countItems % options.pageSize == 0 ?
-                                countItems / options.pageSize : countItems / parseInt(countItems / options.pageSize) + 1;
+                                countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
                             var currentPage = 1;
                             var pagerContainer = self.find(".statreport-pagination");
+
                             pagerContainer.pagy({
                                 currentPage: currentPage,
                                 totalPages: totalPages,
@@ -139,7 +138,7 @@
                                     if(typeof rawData[0] == 'undefined') {
                                         return true;
                                     }
-                                    var from = p*options.pageSize;
+                                    var from = (p-1)*options.pageSize+1;
                                     var to = from + options.pageSize;
                                     data = [rawData[0]].concat(rawData.slice(from, to));
                                     setData(data);
@@ -186,6 +185,13 @@
 
             if(type == 'chart') {
                 $(window).trigger('resize');
+                if(self.data('statreport').enablePagination) {
+                    self.find(".statreport-pagination").show();
+                }
+            } else {
+                if(self.data('statreport').enablePagination) {
+                    self.find(".statreport-pagination").hide();
+                }
             }
         },
 
