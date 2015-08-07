@@ -1,25 +1,58 @@
 (function($) {
-    var buildUrl = function() {
+    var buildUrl = function(params) {
         var self = this;
-        var options = self.data('stat-report');
+        var options = self.data('statreport');
 
-        var params = {};
+        params = typeof params == "undefined" ? {} : params;
         $.each(options.params, function(key, param) {
-            params[key] = param instanceof $ ? param.val() : param;
+            if(param instanceof $) {
+                if(param.is("input") && param.attr("type") == "checkbox") {
+                    params[key] = param.filter(":checked").val();
+                } else {
+                    params[key] = param.val();
+                }
+            } else {
+                params[key] = param;
+            }
         });
 
-        var query = $.param(params);
-        var url = '';
-        if (options.url.indexOf("?") != -1){
-            url = options.url + '&' + query;
-        } else {
-            url = options.url + '?' + query;
+        var url = options.url;
+        if( ! $.isEmptyObject(params)) {
+            var query = $.param(params);
+            if (options.url.indexOf("?") != -1){
+                url += '&' + query;
+            } else {
+                url += '?' + query;
+            }
         }
         return url;
     };
 
+    var ajaxMask = function(options) {
+        var settings = $.extend({
+            stop: false
+        }, options);
+
+        if (!settings.stop) {
+            var loadingDiv = $('<div class="ajax-mask"><div class="loading"></div></div>')
+                .css({
+                    'position': 'absolute',
+                    'top': 0,
+                    'left':0,
+                    'width':'100%',
+                    'height':'100%'
+                });
+
+            $(this).css({ 'position':'relative' }).append(loadingDiv);
+        } else {
+            $(this).find('.ajax-mask').remove();
+        }
+    };
+
     var methods = {
         init: function(options) {
+            $.fn.dataTable.ext.errMode = 'none';
+
             var self = this;
             var defaults = {
                 table: null,
@@ -28,39 +61,80 @@
                 params: {},
                 chartSeries: [],
                 chartOptions: {},
-                tableOptions: {}
+                dataTablesOptions: {},
+                onError: null,
+                onSuccess: null,
+                onFailure: null,
+                onBeforeRequest: null,
+                autoloading: true
             };
-
             options = $.extend(defaults, options);
-            self.data('stat-report', options);
+            self.data('statreport', options);
 
-            var tableOptions = options.tableOptions;
-            tableOptions.ajax = {
-                'url': buildUrl.call(self),
-                'dataSrc': 'table'
-            };
-            var dataTable = options.table.dataTable(tableOptions);
-            self.data('data-tables', dataTable);
-
-            dataTable.on('xhr.dt', function(e, settings, json) {
-                var data = options.chartSeries.concat(json.chart);
-                console.log(data);  // 调试用
-                var highchartsOptions = options.chartOptions;
-                highchartsOptions.data = {
-                    rows: data
-                };
-                options.chart.highcharts(highchartsOptions);
-
-                if(typeof json.caption != 'undefined') {
-                    self.find('div.statreport-caption').html(json.caption);
-                }
-            });
-
-            self.find('div.toggle-view-buttons > button').click(function() {
+            self.find('div.statreport-switcher-buttons > button').click(function() {
                 self.statReport('view', $(this).val());
             });
             self.statReport('view', 'chart');
 
+            if(options.autoloading) {
+                self.statReport('construct');
+            }
+        },
+
+        construct: function(params) {
+            var self = this;
+
+            var options = self.data('statreport');
+
+            var dataTablesOptions = options.dataTablesOptions;
+            dataTablesOptions.ajax = {
+                'url': buildUrl.call(self, params),
+                'dataSrc': 'table'
+            };
+
+            var dataTable = options.table.on('preXhr.dt', function(e, settings, data) {
+                self.data('statreport-loading', true);
+                ajaxMask.call(self);
+            });
+            if(options.onBeforeRequest != null) {
+                dataTable.on('preXhr.dt', options.onBeforeRequest);
+            }
+            dataTable.dataTable(dataTablesOptions);
+
+            self.data('data-tables', dataTable);
+
+            if(options.onError !== null) {
+                dataTable.on('error.dt', options.onError);
+            }
+            dataTable.on('xhr.dt', function(e, settings, json) {
+                self.data('statreport-loading', false);
+
+                if(json != null) {
+                    if(json.status == 0) {
+                        var data = options.chartSeries.concat(json.chart);
+                        var highchartsOptions = options.chartOptions;
+                        highchartsOptions.data = {
+                            rows: data
+                        };
+                        options.chart.highcharts(highchartsOptions);
+
+                        if(typeof json.caption != 'undefined') {
+                            self.find('div.statreport-caption').html(json.caption);
+                        }
+                    } else {
+                        if(options.onFailure != null) {
+                            options.onFailure(e, settings, json);
+                        }
+                    }
+                }
+
+                ajaxMask.call(self, { stop: true });
+            });
+            if(options.onSuccess !== null) {
+                dataTable.on('xhr.dt', options.onSuccess);
+            }
+
+            self.data('constructed', true);
             return self;
         },
 
@@ -69,16 +143,27 @@
 
             self.data('view', type);
 
-            self.find('div.toggle-view-buttons > button').removeClass('btn-primary');
-            self.find('div.toggle-view-buttons > button[value="' + type  + '"]').addClass('btn-primary');
+            self.find('div.statreport-switcher-buttons > button').removeClass('btn-primary');
+            self.find('div.statreport-switcher-buttons > button[value="' + type  + '"]').addClass('btn-primary');
 
-            self.find('div.stat-report-view[data-view-role!="' + type + '"]').hide();
-            self.find('div.stat-report-view[data-view-role="' + type + '"]').show();
+            self.find('div.statreport-view[data-view-role!="' + type + '"]').hide();
+            self.find('div.statreport-view[data-view-role="' + type + '"]').show();
+
+            if(type == 'chart') {
+                $(window).trigger('resize');
+            }
         },
 
-        load: function() {
+        load: function(params) {
             var self = this;
-            self.data('data-tables').api().ajax.url(buildUrl.call(this)).load();
+            if(self.data('statreport-loading')) {
+                return ;
+            }
+            if( ! self.data('constructed')) {
+                self.statReport('construct', params);
+            } else {
+                self.data('data-tables').api().ajax.url(buildUrl.call(self, params)).load();
+            }
         }
     };
 
@@ -98,4 +183,5 @@
 
         return method.apply(this, Array.prototype.slice.call(arguments, isDefaultMethod ? 0 : 1, arguments.length));
     };
+
 })(jQuery);
