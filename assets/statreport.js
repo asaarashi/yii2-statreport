@@ -66,7 +66,10 @@
                 onSuccess: null,
                 onFailure: null,
                 onBeforeRequest: null,
-                autoloading: true
+                autoloading: true,
+                //enablePagination: false,
+                enablePagination: true,
+                pageSize: 10
             };
             options = $.extend(defaults, options);
             self.data('statreport', options);
@@ -113,10 +116,22 @@
                     if(json.status == 0) {
                         var data = options.chartSeries.concat(json.chart);
                         var highchartsOptions = options.chartOptions;
+
                         highchartsOptions.data = {
                             rows: data
                         };
                         options.chart.highcharts(highchartsOptions);
+                        if(options.enablePagination) {
+                            //self.data('statreport').chartOptions.data.rows;
+                            //console.log(self.data('statreport').chartOptions.data.rows);
+                            self.find(".statreport-pagination").bootpag({
+                                total: highchartsOptions.data.rows.length - 1,
+                                page: 1,
+                                maxVisible: 5
+                            }).on('page', function(event, num){
+                                console.log(num);
+                            });
+                        }
 
                         if(typeof json.caption != 'undefined') {
                             self.find('div.statreport-caption').html(json.caption);
@@ -135,6 +150,7 @@
             }
 
             self.data('constructed', true);
+
             return self;
         },
 
