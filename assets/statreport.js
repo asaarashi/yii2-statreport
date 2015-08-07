@@ -67,8 +67,7 @@
                 onFailure: null,
                 onBeforeRequest: null,
                 autoloading: true,
-                //enablePagination: false,
-                enablePagination: true,
+                enablePagination: false,
                 pageSize: 10
             };
             options = $.extend(defaults, options);
@@ -114,23 +113,43 @@
 
                 if(json != null) {
                     if(json.status == 0) {
-                        var data = options.chartSeries.concat(json.chart);
+                        var rawData = options.chartSeries.concat(json.chart);
                         var highchartsOptions = options.chartOptions;
 
-                        highchartsOptions.data = {
-                            rows: data
+                        var data = rawData;
+                        var setData = function(data) {
+                            highchartsOptions.data = {
+                                rows: data
+                            };
+                            options.chart.highcharts(highchartsOptions);
                         };
-                        options.chart.highcharts(highchartsOptions);
                         if(options.enablePagination) {
                             //self.data('statreport').chartOptions.data.rows;
                             //console.log(self.data('statreport').chartOptions.data.rows);
-                            self.find(".statreport-pagination").bootpag({
-                                total: highchartsOptions.data.rows.length - 1,
-                                page: 1,
-                                maxVisible: 5
-                            }).on('page', function(event, num){
-                                console.log(num);
+                            var countItems = data.length - 1;
+                            var totalPages = countItems % options.pageSize == 0 ?
+                                countItems / options.pageSize : countItems / parseInt(countItems / options.pageSize) + 1;
+                            var currentPage = 1;
+                            var pagerContainer = self.find(".statreport-pagination");
+                            pagerContainer.pagy({
+                                currentPage: currentPage,
+                                totalPages: totalPages,
+                                page: function(p) {
+                                    currentPage = p;
+                                    if(typeof rawData[0] == 'undefined') {
+                                        return true;
+                                    }
+                                    var from = p*options.pageSize;
+                                    var to = from + options.pageSize;
+                                    data = [rawData[0]].concat(rawData.slice(from, to));
+                                    setData(data);
+
+                                    return true;
+                                }
                             });
+                            pagerContainer.pagy("page", currentPage);
+                        } else {
+                            setData(data);
                         }
 
                         if(typeof json.caption != 'undefined') {

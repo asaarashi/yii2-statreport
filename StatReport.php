@@ -31,7 +31,9 @@ class StatReport extends Widget {
     public $columns = [];
     public $autoloading = true;
     public $highstock = false;
-    public $enablePagination = true;
+    // Pager
+    public $enablePagination = false;
+    public $pageSize = 10;
     // Handlers
     public $onSuccess;
     public $onFailure;
@@ -82,7 +84,7 @@ class StatReport extends Widget {
         echo ButtonGroup::widget($this->buttonGroupOptions);
 
         if($this->enablePagination) {
-            echo Html::tag('div', '', ['id' => $this->id.'-pagination', 'class' => 'statreport-pagination']);
+            echo Html::tag('div', Html::tag('ul', '', ['class' => 'pagination']), ['id' => $this->id.'-pagination', 'class' => 'statreport-pagination pull-right']);
 
             Pagination::register($this->view);
         }
@@ -142,6 +144,7 @@ class StatReport extends Widget {
             'onError' => ( ! is_null($this->onError) ? $this->onError : null),
             'autoloading' => $this->autoloading,
             'enablePagination' => $this->enablePagination,
+            'pageSize' => $this->pageSize,
         ], JSON_NUMERIC_CHECK);
         $js .= "$('#{$this->id}').statReport({$options});\n";
         $this->view->registerJs($js);
