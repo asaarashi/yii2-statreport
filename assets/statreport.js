@@ -113,8 +113,8 @@
 
                 if(json != null) {
                     if(json.status == 0) {
-                        var rawData = json.chartSeries ? options.chartSeries.concat(json.chart) : {};
-                        var highchartsOptions = options.chartOptions || {};
+                        var rawData = options.chartSeries ? options.chartSeries.concat(json.chart) : [];
+                        var highchartsOptions = options.chartSeries ? options.chartOptions : {};
 
                         var data = rawData;
                         var setData = function(data) {
