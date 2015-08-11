@@ -31,6 +31,7 @@ class StatReport extends Widget {
     public $columns = [];
     public $autoloading = true;
     public $highstock = false;
+    public $renderChart = true;
     // Pager
     public $enablePagination = false;
     public $pageSize = 10;
@@ -78,10 +79,17 @@ class StatReport extends Widget {
             echo Html::endTag('div');
         }
 
-        $this->renderHighcharts();
+        if ($this->renderChart) {
+            $this->renderHighcharts();
+        }
+
         $this->renderDataTablesGridView();
 
-        echo ButtonGroup::widget($this->buttonGroupOptions);
+        if ($this->renderChart) {
+            echo ButtonGroup::widget(ArrayHelper::merge([
+                    'class' => 'btn btn-white'
+                ], $this->buttonGroupOptions));
+        }
 
         if($this->enablePagination) {
             echo Html::tag('div', Html::tag('ul', '', ['class' => 'pagination']), ['id' => $this->id.'-pagination', 'class' => 'statreport-pagination pull-right']);
@@ -129,15 +137,15 @@ class StatReport extends Widget {
     }
 
     public function renderJavaScript() {
-        $js = "var chartSeries{$this->id} = [{$this->chartSeries}];\n";
+        $js = $this->renderChart ? "var chartSeries{$this->id} = [{$this->chartSeries}];\n" : PHP_EOL;
         $options = Json::encode([
             'table' => new JsExpression("$('#{$this->id} > .grid-view > table').eq(0)"),
-            'chart' => new JsExpression("$('#{$this->highcharts->getId()}')"),
+            'chart' => $this->renderChart ? new JsExpression("$('#{$this->highcharts->getId()}')") : null,
             'url' => $this->url,
             'params' => $this->encodeParams(),
             'dataTablesOptions' => $this->dataTablesOptions,
-            'chartSeries' => new JsExpression("chartSeries{$this->id}"),
-            'chartOptions' => $this->highcharts->options,
+            'chartSeries' => $this->renderChart ?  new JsExpression("chartSeries{$this->id}") : null,
+            'chartOptions' => $this->renderChart ? $this->highcharts->options : null,
             'onSuccess' => ( ! is_null($this->onSuccess) ? $this->onSuccess : null),
             'onFailure' => ( ! is_null($this->onFailure) ? $this->onFailure : null),
             'onBeforeRequest' => ( ! is_null($this->onBeforeRequest) ? $this->onBeforeRequest : null),
@@ -205,8 +213,8 @@ class StatReport extends Widget {
     public function initButtonOptions() {
         $this->buttonGroupOptions['options']['class'] = 'statreport-switcher-buttons';
         $this->buttonGroupOptions['buttons'] = [
-            ['label' => $this->switchBtnChartLabel, 'options' => ['value' => static::VIEW_CHART]],
-            ['label' => $this->switchBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE]],
+            ['label' => $this->switchBtnChartLabel, 'options' => ['value' => static::VIEW_CHART, 'class' => 'btn btn-white btn-primary']],
+            ['label' => $this->switchBtnTableLabel, 'options' => ['value' => static::VIEW_TABLE, 'class' => 'btn btn-white']],
         ];
         $this->buttonGroupOptions['encodeLabels'] = false;
     }

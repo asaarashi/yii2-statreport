@@ -113,8 +113,8 @@
 
                 if(json != null) {
                     if(json.status == 0) {
-                        var rawData = options.chartSeries.concat(json.chart);
-                        var highchartsOptions = options.chartOptions;
+                        var rawData = json.chartSeries ? options.chartSeries.concat(json.chart) : {};
+                        var highchartsOptions = options.chartOptions || {};
 
                         var data = rawData;
                         var setData = function(data) {
@@ -177,11 +177,17 @@
 
             self.data('view', type);
 
-            self.find('div.statreport-switcher-buttons > button').removeClass('btn-primary');
-            self.find('div.statreport-switcher-buttons > button[value="' + type  + '"]').addClass('btn-primary');
+            self.find('div.statreport-switcher-buttons > button')
+                .removeClass('btn-primary')
+                .addClass('btn-white');
+            self.find('div.statreport-switcher-buttons > button[value="' + type  + '"]')
+                .removeClass('btn-white')
+                .addClass('btn-primary');
 
-            self.find('div.statreport-view[data-view-role!="' + type + '"]').hide();
-            self.find('div.statreport-view[data-view-role="' + type + '"]').show();
+            if (self.find('div.statreport-view').length > 1) {
+                self.find('div.statreport-view[data-view-role!="' + type + '"]').hide();
+                self.find('div.statreport-view[data-view-role="' + type + '"]').show();
+            }
 
             if(type == 'chart') {
                 $(window).trigger('resize');
