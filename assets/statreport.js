@@ -121,7 +121,7 @@
                             highchartsOptions.data = {
                                 rows: data
                             };
-                            options.chart.highcharts(highchartsOptions);
+                            if (options.chart) options.chart.highcharts(highchartsOptions);
                         };
                         if(options.enablePagination) {
                             var countItems = data.length - 1;
