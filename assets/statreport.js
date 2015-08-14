@@ -129,12 +129,14 @@
                                 countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
                             var currentPage = 1;
                             var pagerContainer = self.find(".statreport-pagination");
+                            pagerContainer.data('statreport-raw-data', rawData);
 
                             pagerContainer.pagy({
                                 currentPage: currentPage,
                                 totalPages: totalPages,
                                 page: function(p) {
                                     currentPage = p;
+                                    var rawData = pagerContainer.data('statreport-raw-data');
                                     if(typeof rawData[0] == 'undefined') {
                                         return true;
                                     }
