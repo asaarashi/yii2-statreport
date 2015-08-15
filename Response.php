@@ -34,12 +34,12 @@ class Response extends Object {
             if($this->caption) {
                 $response['caption'] = $this->caption;
             }
-            foreach($this->data as $row) {
+            foreach($this->data as $key => $row) {
                 $tableRow = [];
                 $chartRow = [];
                 foreach($this->dataSeries as $s) {
                     if ($s->value !== null) {
-                        $value = call_user_func($s->value, $row);
+                        $value = call_user_func($s->value, $row, $key);
                     } else {
                         $value = ArrayHelper::getValue($row, $s->name);
                     }
