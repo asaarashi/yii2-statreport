@@ -8,7 +8,7 @@ class DataTablesResponsiveAsset extends AssetBundle {
 
     public $sourcePath = '@vendor/bower/datatables-responsive';
     public $css = [
-        'css/responsive.dataTables.scss',
+        'css/responsive.dataTables.css',
     ];
     public $js = [
         'js/dataTables.responsive.js',
