@@ -149,6 +149,9 @@
                                 }
                             });
                             pagerContainer.pagy("page", currentPage);
+                            if(totalPages == 1) {
+                                pagerContainer.hide();
+                            }
                         } else {
                             setData(data);
                         }
