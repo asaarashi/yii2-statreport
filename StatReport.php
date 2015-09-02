@@ -183,7 +183,8 @@ class StatReport extends Widget {
                 ]),
             'options' => [
                 'data-view-role' => static::VIEW_TABLE,
-                'class' => 'grid-view statreport-view'
+                'class' => 'grid-view statreport-view',
+                'style' => $this->renderChart ? 'display: none;' : '',
             ],
             'tableOptions' => $this->tableOptions,
         ]);
