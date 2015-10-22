@@ -22,6 +22,7 @@
     "bower-asset/datatables-bootstrap3": "*",
     "bower-asset/datatables-responsive": "*",
     "bower-asset/bootstrap-pagy": "*",
+    "bower-asset/datatables-fixedheader": "*",
     "miloschuman/yii2-highcharts-widget": "*"
   },
   "autoload": {

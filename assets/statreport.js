@@ -3,27 +3,11 @@
         var self = this;
         var options = self.data('statreport');
 
-        params = typeof params == "undefined" ? {} : params;
-        $.each(options.params, function(key, param) {
-            if(param instanceof $) {
-                if(param.is("input") && param.attr("type") == "checkbox") {
-                    params[key] = param.filter(":checked").val();
-                } else {
-                    params[key] = param.val();
-                }
-            } else {
-                params[key] = param;
-            }
-        });
-
         var url = options.url;
-        if( ! $.isEmptyObject(params)) {
-            var query = $.param(params);
-            if (options.url.indexOf("?") != -1){
-                url += '&' + query;
-            } else {
-                url += '?' + query;
-            }
+        if (options.url.indexOf("?") != -1){
+            url += '&' + params;
+        } else {
+            url += '?' + params;
         }
         return url;
     };
@@ -58,7 +42,6 @@
                 table: null,
                 chart: null,
                 url: '',
-                params: {},
                 chartSeries: [],
                 chartOptions: {},
                 dataTablesOptions: {},
@@ -66,26 +49,32 @@
                 onSuccess: null,
                 onFailure: null,
                 onBeforeRequest: null,
-                autoloading: true,
                 enablePagination: false,
+                fixedHeader: true,
                 pageSize: 10
             };
             options = $.extend(defaults, options);
             self.data('statreport', options);
 
+            // Bind switch buttons
             self.find('div.statreport-switcher-buttons > button').click(function() {
                 self.statReport('view', $(this).val());
             });
             self.statReport('view', 'chart');
 
-            if(options.autoloading) {
-                self.statReport('construct');
-            }
+            //if(options.autoloading) {
+            //    self.statReport('construct', params);
+            //}
         },
 
         construct: function(params) {
             var self = this;
 
+            if(typeof params != 'undefined') {
+                self.statReport('params', params);
+            } else {
+                params = self.statReport('params');
+            }
             var options = self.data('statreport');
 
             var dataTablesOptions = options.dataTablesOptions;
@@ -96,6 +85,7 @@
 
             var dataTable = options.table.on('preXhr.dt', function(e, settings, data) {
                 self.data('statreport-loading', true);
+                // Show AJAX spinner
                 ajaxMask.call(self);
             });
             if(options.onBeforeRequest != null) {
@@ -126,7 +116,7 @@
                         if(options.enablePagination) {
                             var countItems = data.length - 1;
                             var totalPages = countItems % options.pageSize == 0 ?
-                                countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
+                            countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
                             var currentPage = 1;
                             var pagerContainer = self.find(".statreport-pagination");
                             pagerContainer.data('statreport-raw-data', rawData);
@@ -206,10 +196,27 @@
             }
         },
 
+        params: function(params) {
+            var self = this;
+            if(typeof params != 'undefined') {
+                if(typeof params == 'object') {
+                    params = $.param(params);
+                }
+                self.data('params', params);
+            } else {
+                return self.data('params');
+            }
+        },
+
         load: function(params) {
             var self = this;
             if(self.data('statreport-loading')) {
                 return ;
+            }
+            if(typeof params != 'undefined') {
+                self.statReport('params', params);
+            } else {
+                params = self.statReport('params');
             }
             if( ! self.data('constructed')) {
                 self.statReport('construct', params);

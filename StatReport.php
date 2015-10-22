@@ -11,6 +11,7 @@ use yii\base\InvalidConfigException;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
+use yii\web\View;
 
 class StatReport extends Widget {
     public $htmlOptions = [];
@@ -21,17 +22,18 @@ class StatReport extends Widget {
     public $chartOptions = [];
     public $showCaption = true;
     public $captionOptions = [];
-    public $params = [];
     public $switchBtnTableLabel = '<i class="fa fa-table"></i>';
     public $switchBtnChartLabel = '<i class="fa fa-line-chart"></i>';
     public $bootstrap = true;
     public $responsive = true;
     public $highcharts;
+//    public $params;
     public $chartSeries = [];
     public $columns = [];
-    public $autoloading = true;
     public $highstock = false;
     public $renderChart = true;
+    // FixedHeader
+    public $fixedHeader = true;
     // Pager
     public $enablePagination = false;
     public $pageSize = 10;
@@ -107,6 +109,12 @@ class StatReport extends Widget {
             DataTablesResponsiveAsset::register($this->view);
             $this->dataTablesOptions = ArrayHelper::merge(['responsive' => true], $this->dataTablesOptions);
         }
+        /*
+        if($this->fixedHeader) {
+            FixedHeaderAsset::register($this->view);
+            $this->dataTablesOptions = ArrayHelper::merge(['fixedHeader' => true], $this->dataTablesOptions);
+        }
+        */
 
         $this->renderChartSeries();
 
@@ -114,6 +122,7 @@ class StatReport extends Widget {
         parent::run();
     }
 
+    /*
     public function encodeParams() {
         $params = array();
         foreach($this->params as $key => $param) {
@@ -126,6 +135,7 @@ class StatReport extends Widget {
         }
         return $params;
     }
+    */
 
     public function renderChartSeries() {
         foreach($this->series as $s) {
@@ -142,15 +152,15 @@ class StatReport extends Widget {
             'table' => new JsExpression("$('#{$this->id} > .grid-view > table').eq(0)"),
             'chart' => $this->renderChart ? new JsExpression("$('#{$this->highcharts->getId()}')") : null,
             'url' => $this->url,
-            'params' => $this->encodeParams(),
             'dataTablesOptions' => $this->dataTablesOptions,
+//            'params' => $this->params,
             'chartSeries' => $this->renderChart ?  new JsExpression("chartSeries{$this->id}") : null,
             'chartOptions' => $this->renderChart ? $this->highcharts->options : null,
             'onSuccess' => ( ! is_null($this->onSuccess) ? $this->onSuccess : null),
             'onFailure' => ( ! is_null($this->onFailure) ? $this->onFailure : null),
             'onBeforeRequest' => ( ! is_null($this->onBeforeRequest) ? $this->onBeforeRequest : null),
             'onError' => ( ! is_null($this->onError) ? $this->onError : null),
-            'autoloading' => $this->autoloading,
+//            'autoload' => $this->autoload,
             'enablePagination' => $this->enablePagination,
             'pageSize' => $this->pageSize,
         ], JSON_NUMERIC_CHECK);
