@@ -113,7 +113,7 @@
                             };
                             if (options.chart) options.chart.highcharts(highchartsOptions);
                         };
-                        if(options.enablePagination) {
+                        if(options.enablePagination && data.length > 1) {
                             var countItems = data.length - 1;
                             var totalPages = countItems % options.pageSize == 0 ?
                             countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
