@@ -18,12 +18,12 @@
   "minimum-stability": "dev",
   "require": {
     "yiisoft/yii2-bootstrap": "*",
-    "bower-asset/datatables": "*",
-    "bower-asset/datatables-bootstrap3": "*",
-    "bower-asset/datatables-responsive": "*",
-    "bower-asset/bootstrap-pagy": "*",
-    "bower-asset/datatables-fixedheader": "*",
-    "miloschuman/yii2-highcharts-widget": "*"
+    "bower-asset/datatables": "1.10.10",
+    "bower-asset/datatables-bootstrap3": "0.1",
+    "bower-asset/datatables-responsive": "2.0.*",
+    "bower-asset/bootstrap-pagy": "0.3.*",
+    "bower-asset/datatables-fixedheader": "3.1.*",
+    "miloschuman/yii2-highcharts-widget": "4.2.*"
   },
   "autoload": {
     "psr-4": {
