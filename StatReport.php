@@ -196,7 +196,12 @@ class StatReport extends Widget {
                 'class' => 'grid-view statreport-view',
                 'style' => $this->renderChart ? 'display: none;' : '',
             ],
-            'tableOptions' => $this->tableOptions,
+            'tableOptions' => ArrayHelper::merge(
+                [
+                    'width' => '100%',
+                ],
+                $this->tableOptions
+            ),
         ]);
     }
 
