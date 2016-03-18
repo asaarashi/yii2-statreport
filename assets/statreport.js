@@ -185,7 +185,9 @@
             }
 
             if(type == 'chart') {
-                $(window).trigger('resize');
+                if (typeof self.find('.statreport-view').highcharts() != 'undefined') {
+                    self.find('.statreport-view').highcharts().reflow();
+                }
                 if(self.data('statreport').enablePagination) {
                     self.find(".statreport-pagination").show();
                 }
