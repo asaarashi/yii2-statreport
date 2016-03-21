@@ -185,7 +185,7 @@
             }
 
             if(type == 'chart') {
-                if (typeof self.find('.statreport-view').highcharts() != 'undefined') {
+                if (typeof self.find('.statreport-view').highcharts == 'function' && typeof self.find('.statreport-view').highcharts() != 'undefined') {
                     self.find('.statreport-view').highcharts().reflow();
                 }
                 if(self.data('statreport').enablePagination) {
