@@ -83,6 +83,7 @@ class StatReport extends Widget {
 
         if ($this->renderChart) {
             $this->renderHighcharts();
+
         }
 
         $this->renderDataTablesGridView();
@@ -91,12 +92,6 @@ class StatReport extends Widget {
             echo ButtonGroup::widget(ArrayHelper::merge([
                     'class' => 'btn btn-white'
                 ], $this->buttonGroupOptions));
-        }
-
-        if($this->enablePagination) {
-            echo Html::tag('div', Html::tag('ul', '', ['class' => 'pagination']), ['id' => $this->id.'-pagination', 'class' => 'statreport-pagination pull-right']);
-
-            Pagination::register($this->view);
         }
 
         echo Html::endTag('div');
@@ -181,6 +176,10 @@ class StatReport extends Widget {
         $this->highcharts->scripts = [ ! $this->highstock ? 'highcharts' : 'highstock', 'modules/data'];
         $this->highcharts->callback = 'createHighcharts' . $this->getId();
         $this->highcharts->end();
+        if($this->enablePagination) {
+//            echo Html::tag('div', Html::tag('ul', '', ['class' => 'pagination']), ['id' => $this->id.'-pagination', 'class' => 'statreport-pagination pull-right']);
+            Pagination::register($this->view);
+        }
     }
 
     public function renderDataTablesGridView() {

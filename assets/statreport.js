@@ -113,12 +113,22 @@
                             };
                             if (options.chart) options.chart.highcharts(highchartsOptions);
                         };
-                        if(options.enablePagination && data.length > 1) {
-                            var countItems = data.length - 1;
-                            var totalPages = countItems % options.pageSize == 0 ?
-                            countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
+                        if(options.enablePagination) {
+                            self.find('div.statreport-pagination').remove();
+                            var pagerContainer = $('<div></div>').addClass('statreport-pagination pull-right').append(
+                                $('<ul></ul>').addClass('pagination')
+                            );
+                            self.find('div.statreport-view[data-view-role=chart]').after(pagerContainer);
+
                             var currentPage = 1;
-                            var pagerContainer = self.find(".statreport-pagination");
+                            var totalPages = 1;
+                            var countItems = 0;
+                            if(data.length > 1) {
+                                countItems = data.length - 1;
+                                totalPages = countItems % options.pageSize == 0 ?
+                                    countItems / options.pageSize : parseInt(countItems / options.pageSize) + 1;
+                            }
+
                             pagerContainer.data('statreport-raw-data', rawData);
 
                             pagerContainer.pagy({
@@ -139,9 +149,6 @@
                                 }
                             });
                             pagerContainer.pagy("page", currentPage);
-                            if(totalPages == 1) {
-                                pagerContainer.hide();
-                            }
                         } else {
                             setData(data);
                         }
