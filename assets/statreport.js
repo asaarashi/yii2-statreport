@@ -117,7 +117,7 @@
                             self.find('div.statreport-pagination').remove();
                             var pagerContainer = $('<div></div>').addClass('statreport-pagination pull-right').append(
                                 $('<ul></ul>').addClass('pagination')
-                            );
+                            ).hide();
                             self.find('div.statreport-view[data-view-role=chart]').after(pagerContainer);
 
                             var currentPage = 1;
@@ -149,6 +149,10 @@
                                 }
                             });
                             pagerContainer.pagy("page", currentPage);
+
+                            if(self.data('view-role') == 'chart') {
+                                pagerContainer.show();
+                            }
                         } else {
                             setData(data);
                         }
