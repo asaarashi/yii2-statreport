@@ -61,10 +61,6 @@
                 self.statReport('view', $(this).val());
             });
             self.statReport('view', 'chart');
-
-            //if(options.autoloading) {
-            //    self.statReport('construct', params);
-            //}
         },
 
         construct: function(params) {
@@ -219,9 +215,6 @@
 
         load: function(params) {
             var self = this;
-            if(self.data('statreport-loading')) {
-                return ;
-            }
             if(typeof params != 'undefined') {
                 self.statReport('params', params);
             } else {
@@ -230,6 +223,9 @@
             if( ! self.data('constructed')) {
                 self.statReport('construct', params);
             } else {
+                if(self.data('data-tables').DataTable().settings.jqXHR) {
+                    self.data('data-tables').DataTable().settings.jqXHR.abort();
+                }
                 self.data('data-tables').api().ajax.url(buildUrl.call(self, params)).load();
             }
         }
