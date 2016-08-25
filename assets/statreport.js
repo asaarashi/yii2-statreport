@@ -145,6 +145,12 @@
                                 }
                             });
                             pagerContainer.pagy("page", currentPage);
+
+                            if(self.data('view') == 'chart') {
+                                pagerContainer.show();
+                            } else {
+                                pagerContainer.hide();
+                            }
                         } else {
                             setData(data);
                         }
